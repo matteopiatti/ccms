@@ -1,13 +1,19 @@
 <script>
   const { data } = $props();
-  //onsole.log(data);
+  //console.log(data);
 </script>
 
-<h1>{data.page.title}</h1>
-<p>{data.page.content}</p>
+<svelte:head>
+  <title>{data.metadata.title}</title>
+  <meta name="description" content={data.metadata.description} />
+</svelte:head>
 
 {#each data.components as c}
-  <c.component.default />
+  {#if Object.keys(c.props).length > 0}
+    <c.component.default {...c.props} />
+  {:else}
+    <c.component.default {...c.props_schema} />
+  {/if}
 {/each}
 
 <a href="/admin">Back to Admin</a>

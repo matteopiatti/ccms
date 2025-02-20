@@ -22,7 +22,7 @@ const migrate = async () => {
       table.increments("id").primary();
       table.text("name");
       table.text("url");
-      table.json("props");
+      table.json("props_schema");
     });
   }
 
@@ -31,7 +31,9 @@ const migrate = async () => {
       table.increments("id").primary();
       table.integer("page_id").references("pages.id");
       table.integer("component_id").references("components.id");
+      table.integer("parent_component_id").references("page_components.id");
       table.json("props");
+      table.integer("order");
     });
   }
 };

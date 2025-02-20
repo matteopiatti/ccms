@@ -8,6 +8,6 @@ export const load = async ({ data }) => {
 
   return {
     components,
-    page: data.page,
+    metadata: data.metadata,
   };
 };

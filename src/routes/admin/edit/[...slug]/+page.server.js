@@ -1,37 +1,132 @@
 import { redirect } from "@sveltejs/kit";
 import { base } from "$lib/knex";
+import {
+  getPageComponents,
+  deletePageComponent,
+  createPageComponent,
+  getAllComponents,
+  getPage,
+  editPage,
+  editPageComponent,
+} from "$lib";
 
 export const load = async ({ locals, params }) => {
-  const slug = params.slug;
-  const page = await base("pages").where({ slug }).first();
-  const components =
-    (await base("page_components")
-      .join("components", "page_components.component_id", "components.id")
-      .join("pages", "page_components.page_id", "pages.id")
-      .where("pages.slug", slug)
-      .select("components.*")) || [];
-  //console.log(components);
+  const page = await getPage(base, params.slug);
 
   return {
-    pageData: page,
-    components,
+    metadata: page,
+    blocks: await getPageComponents(base, page.id),
+    components: await getAllComponents(base),
   };
 };
 
 export const actions = {
-  pageData: async ({ locals, request }) => {
-    const db = locals.db;
+  editMetadata: async ({ locals, request }) => {
     const data = await request.formData();
-    const content = data.get("content");
-    const slug = data.get("slug");
-    const title = data.get("title");
-    const id = data.get("id");
-    return redirect(302, `/admin/edit/${slug}`);
+
+    await editPage(
+      base,
+      data.get("id"),
+      data.get("title"),
+      data.get("slug"),
+      data.get("content")
+    );
+
+    return redirect(302, `/admin/edit/${data.get("slug")}`);
   },
-  props: async ({ request }) => {
+  props: async ({ request, url }) => {
     const data = await request.formData();
-    const component = data.get("component");
-    const props = data.get("props");
-    return redirect(302, `/admin`);
+
+    console.log(getProps(data.entries()));
+
+    await editPageComponent(
+      base,
+      data.get("page_id"),
+      data.get("component_id"),
+      data.get("page_components_id"),
+      getProps(data.entries()),
+      getChildren(data.entries())
+    );
+
+    return redirect(302, url.pathname);
   },
+  delete: async ({ request, url }) => {
+    const data = await request.formData();
+    await deletePageComponent(base, data.get("page_components_id"));
+    return redirect(302, url.pathname);
+  },
+  add: async ({ request, url }) => {
+    const data = await request.formData();
+    createPageComponent(base, data.get("page_id"), data.get("component_id"));
+    return redirect(302, url.pathname);
+  },
+  moveUp: async ({ request, url }) => {
+    const data = await request.formData();
+    const page_components_id = data.get("page_components_id");
+    const page_id = data.get("page_id");
+
+    try {
+      const page_components = await base("page_components")
+        .where({ id: page_components_id })
+        .first();
+      const order = page_components.order;
+      const all = await base("page_components").where({ page_id }).select("*");
+      const prev = all
+        .filter((c) => c.order < order)
+        .reduce((a, b) => (a.order > b.order ? a : b));
+
+      if (prev) {
+        await base("page_components")
+          .where({ id: page_components_id })
+          .update({ order: order - 1 });
+        await base("page_components").where({ id: prev.id }).update({ order });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
+    return redirect(302, url.pathname);
+  },
+  moveDown: async ({ request, url }) => {
+    const data = await request.formData();
+    const page_components_id = data.get("page_components_id");
+    const page_id = data.get("page_id");
+
+    try {
+      const page_components = await base("page_components")
+        .where({ id: page_components_id })
+        .first();
+      const order = page_components.order;
+      const all = await base("page_components").where({ page_id }).select("*");
+      const next = all
+        .filter((c) => c.order > order)
+        .reduce((a, b) => (a.order < b.order ? a : b));
+      if (next) {
+        await base("page_components")
+          .where({ id: page_components_id })
+          .update({ order: order + 1 });
+        await base("page_components").where({ id: next.id }).update({ order });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
+    return redirect(302, url.pathname);
+  },
+};
+
+const getProps = (data) => {
+  return Object.fromEntries(
+    [...data]
+      .filter(([key]) => key.startsWith("prop_"))
+      .map(([key, value]) => [key.replace("prop_", ""), value])
+  );
+};
+
+const getChildren = (data) => {
+  return [...data]
+    .filter(([key]) => key.startsWith("slot_"))
+    .map(([key, value]) => {
+      return { [key.replace("slot_", "")]: value };
+    });
 };

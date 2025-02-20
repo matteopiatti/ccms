@@ -19,14 +19,14 @@ async function fakePageComponents() {
     const pages = await base("pages").select("id");
     const components = await base("components").select("id");
     const pageComponents = pages.flatMap((page) => {
-      // random number min: 0 max: components.length
-      const numComponents = Math.floor(Math.random() * components.length);
-      const selectedComponents = faker.helpers
-        .shuffle(components)
-        .slice(0, numComponents);
-      return selectedComponents.map((component) => ({
+      let order = 0;
+      const componentsTwice = components.concat(components);
+      return componentsTwice.map((component) => ({
         page_id: page.id,
         component_id: component.id,
+        parent_component_id: null,
+        props: JSON.stringify({}),
+        order: order++,
       }));
     });
     await base("page_components").insert(pageComponents);

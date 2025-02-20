@@ -1,13 +1,9 @@
-export const load = async ({ data }) => {
-  const components = await Promise.all(
-    data.components.map(async (c) => {
-      const component = await import("/" + c.url);
-      return { ...c, component };
-    })
-  );
+import { populateComponents } from "$lib";
 
+export const load = async ({ data: { components, metadata, blocks } }) => {
   return {
-    components,
-    pageData: data.pageData,
+    components: await populateComponents(components),
+    metadata,
+    blocks,
   };
 };

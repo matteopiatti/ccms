@@ -1,6 +1,5 @@
 import { base, migrate } from "$lib/knex";
 import { seed } from "$lib/faker";
-import { parse, compile } from "svelte/compiler";
 import * as Components from "$lib/components";
 
 await migrate();
@@ -10,6 +9,7 @@ await seed();
 async function syncComponents() {
   await base("page_components").truncate();
   await base("components").truncate();
+
   Object.entries(Components).forEach(async ([key, value]) => {
     const filenameSymbol = Object.getOwnPropertySymbols(value).find(
       (sym) => sym.toString() === "Symbol(filename)"
@@ -23,7 +23,7 @@ async function syncComponents() {
       await base("components").insert({
         name: key,
         url: filename,
-        props: JSON.stringify(props),
+        props_schema: JSON.stringify(props),
       });
     } catch (e) {
       console.error(e);
