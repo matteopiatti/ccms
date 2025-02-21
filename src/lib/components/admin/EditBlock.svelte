@@ -2,23 +2,30 @@
   import Label from "../ui/label/label.svelte";
   import Input from "../ui/input/input.svelte";
   import EditBlock from "./EditBlock.svelte";
+  import ColorPicker from "./ColorPicker.svelte";
+  import AdminInput from "./AdminInput.svelte";
   import { SquarePen, X, Trash2, ChevronDown, ChevronUp } from "lucide-svelte";
   import { enhance } from "$app/forms";
   import { Button } from "../ui/button/index.js";
 
-  const { block = {}, components = [], page_id } = $props();
+  let {
+    block = {},
+    components = [],
+    page_id,
+    current = $bindable(),
+  } = $props();
   let BLOCK = $state();
-  let isEdit = $state(false);
+  let isEdit = $derived(current === block.page_components_id);
 
   $effect(async () => {
     BLOCK = (await import(/* @vite-ignore */ "/" + block.url)).default;
   });
 </script>
 
-<div class="relative">
+<div class="relative" class:z-50={isEdit}>
   <div class="w-full h-full absolute group" class:pointer-events-none={isEdit}>
     <button
-      onclick={() => (isEdit = !isEdit)}
+      onclick={() => (current = isEdit ? null : block.page_components_id)}
       class:opacity-100={isEdit}
       class="w-full h-full absolute p-2 cursor-pointer z-50 inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-start justify-end rounded-lg outline-blue-500 outline outline-2"
     >
@@ -37,23 +44,24 @@
   {#if BLOCK}
     <BLOCK {...block.props}>
       {#each block.children as child}
-        <EditBlock block={child} {page_id} {components} />
+        <EditBlock block={child} {page_id} {components} bind:current />
       {/each}
     </BLOCK>
   {/if}
 
   {#if isEdit}
-    <div class="flex items-end gap-4 p-4 bg-white text-black">
+    <div class="flex items-end gap-4 p-4 bg-white text-black" c>
       {@render editForm(block, page_id, block.page_components_id)}
       {#if block.props_schema.some((prop) => prop.name === "children")}
-        <p>schildrön</p>
         {#each components as component}
           {@render addChild(page_id, component, block.page_components_id)}
         {/each}
       {/if}
-      {@render moveButton("Up", page_id, block.page_components_id)}
-      {@render deleteButton(block.page_components_id)}
-      {@render moveButton("Down", page_id, block.page_components_id)}
+      <div class="ml-auto flex gap-2">
+        {@render moveButton("Up", page_id, block.page_components_id)}
+        {@render deleteButton(block.page_components_id)}
+        {@render moveButton("Down", page_id, block.page_components_id)}
+      </div>
     </div>
   {/if}
 </div>
@@ -69,10 +77,18 @@
     <input type="hidden" name="component_id" value={block.id} />
     <input type="hidden" name="page_components_id" value={page_components_id} />
     {#each block.props_schema as prop}
-      <Label class="flex flex-col gap-2">
-        {prop.name}
-        <Input name="prop_{prop.name}" value={block.props[prop.name]} />
-      </Label>
+      {#if prop.type === "color"}
+        <ColorPicker
+          name="prop_{prop.name}"
+          title={prop.title}
+          value={block.props[prop.name]}
+        />
+      {:else}
+        <Label class="flex flex-col gap-2">
+          {prop.title}
+          <Input name="prop_{prop.name}" value={block.props[prop.name]} />
+        </Label>
+      {/if}
     {/each}
     <Button type="submit">Save</Button>
   </form>

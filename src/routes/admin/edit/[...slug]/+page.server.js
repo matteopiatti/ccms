@@ -44,13 +44,12 @@ export const actions = {
       data.get("page_components_id"),
       getProps(data.entries())
     );
-
-    return redirect(302, url.pathname);
+    return { success: true };
   },
   delete: async ({ request, url }) => {
     const data = await request.formData();
     await deletePageComponent(base, data.get("page_components_id"));
-    return redirect(302, url.pathname);
+    return { success: true };
   },
   add: async ({ request, url }) => {
     const data = await request.formData();
@@ -60,7 +59,8 @@ export const actions = {
       data.get("component_id"),
       data.get("parent_component_id")
     );
-    return redirect(302, url.pathname);
+
+    return { success: true };
   },
   moveUp: async ({ request, url }) => {
     const data = await request.formData();
@@ -87,7 +87,7 @@ export const actions = {
       console.error(e);
     }
 
-    return redirect(302, url.pathname);
+    return { success: true };
   },
   moveDown: async ({ request, url }) => {
     const data = await request.formData();
@@ -113,7 +113,7 @@ export const actions = {
       console.error(e);
     }
 
-    return redirect(302, url.pathname);
+    return { success: true };
   },
 };
 

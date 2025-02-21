@@ -15,6 +15,7 @@ export const actions = {
   },
   deletePage: async ({ request }) => {
     const data = await request.formData();
+    console.log(data.get("id"));
     deletePage(base, data.get("id"));
   },
 };

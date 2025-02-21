@@ -1,38 +1,41 @@
 <script>
+  import EditDialog from "$lib/components/admin/EditDialog.svelte";
   import Block from "$lib/components/admin/Block.svelte";
   import { Button, buttonVariants } from "$lib/components/ui/button/index.js";
   import * as Table from "$lib/components/ui/table/index.js";
   import * as Dialog from "$lib/components/ui/dialog/index.js";
-  import { Label } from "$lib/components/ui/label/index.js";
-  import { Input } from "$lib/components/ui/input/index.js";
+  import AdminInput from "$lib/components/admin/AdminInput.svelte";
   import { Trash2 } from "lucide-svelte";
   import { enhance } from "$app/forms";
+  import Header from "$lib/components/admin/Header.svelte";
+  import AdminTitle from "$lib/components/admin/AdminTitle.svelte";
+  import AdminFormButton from "$lib/components/admin/AdminFormButton.svelte";
 
   let { data } = $props();
   const { pages, blocks } = $derived(data);
-  let pageDialog = $state({ isOpen: false });
+  let isOpen = $state(false);
 </script>
 
-<div class="hidden flex-col md:flex">
-  <div class="border-b">
-    <div class="flex h-16 items-center px-4">
-      <h1 class="text-3xl font-bold tracking-tight">CCMS</h1>
-      <div class="ml-auto">Admin</div>
-    </div>
-  </div>
-</div>
+<Header title="Pages" name="Admin" />
 
 <div class="flex flex-col px-4 py-2">
-  <div class="flex items-center justify-between py-2 border-b">
-    <h2 class="text-2xl font-bold">Pages</h2>
-    {@render createPageDialog(pageDialog)}
-  </div>
+  <AdminTitle title="Pages">
+    <EditDialog
+      bind:isOpen
+      name="New Page"
+      description="Create a new page"
+      submit="Create"
+      action="?/createPage"
+    >
+      <AdminInput title="Page title" name="title" />
+      <AdminInput title="Slug" name="slug" />
+      <AdminInput title="Content" name="content" />
+    </EditDialog>
+  </AdminTitle>
 
   {@render pageTable(pages)}
 
-  <div class="flex items-center justify-between py-2 border-b">
-    <h2 class="text-2xl font-bold">Components</h2>
-  </div>
+  <AdminTitle title="Components" />
 
   <div>
     {#each blocks as block}
@@ -68,52 +71,14 @@
       <div class="flex flex-row gap-2 justify-end">
         <a href="/admin/edit/{slug}" class={buttonVariants()}>Edit</a>
         <a href={slug} class={buttonVariants({ variant: "outline" })}>Visit</a>
-        <form method="POST" action="?/deletePage" use:enhance>
-          <input type="hidden" name="id" value={id} />
-          <Button type="submit" variant="destructive"><Trash2 /></Button>
-        </form>
+        <AdminFormButton
+          action="?/deletePage"
+          hiddenFields={[{ name: "id", value: id }]}
+          variant="destructive"
+        >
+          <Trash2 />
+        </AdminFormButton>
       </div>
     </Table.Cell>
   </Table.Row>
-{/snippet}
-
-{#snippet createPageDialog(state)}
-  <Dialog.Root bind:open={state.isOpen}>
-    <Dialog.Trigger class={buttonVariants({ variant: "outline" })}>
-      New Page
-    </Dialog.Trigger>
-    <Dialog.Content>
-      <form
-        method="POST"
-        action="?/createPage"
-        use:enhance={() => {
-          state.isOpen = false;
-        }}
-      >
-        <Dialog.Header>
-          <Dialog.Title>New Page</Dialog.Title>
-          <Dialog.Description>Create a new Page</Dialog.Description>
-        </Dialog.Header>
-
-        <div class="grid gap-4 py-4">
-          <Label class="flex flex-col gap-2">
-            Page title
-            <Input name="title" class="col-span-3" />
-          </Label>
-          <Label class="flex flex-col gap-2">
-            Slug
-            <Input name="slug" class="col-span-3" />
-          </Label>
-          <Label class="flex flex-col gap-2">
-            Content
-            <Input name="content" class="col-span-3" />
-          </Label>
-        </div>
-
-        <Dialog.Footer>
-          <Button type="submit">Create page</Button>
-        </Dialog.Footer>
-      </form>
-    </Dialog.Content>
-  </Dialog.Root>
 {/snippet}

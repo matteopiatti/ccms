@@ -2,22 +2,18 @@
   export const metadata = {
     props: [
       {
-        name: "clickAction",
-        type: "function",
-        default: "defaultButtonClickHandler",
-        description: "The function to call when the button is clicked.",
-      },
-      {
         name: "buttonText",
+        title: "Button Text",
         type: "string",
         default: "Click Me",
         description: "The text to display on the button.",
       },
       {
-        name: "buttonVariant",
+        name: "buttonColor",
+        title: "Button Color",
         type: "color",
-        default: "#9EBC9E",
-        description: "The variant of the button.",
+        default: "#737373",
+        description: "The Color of the button.",
       },
     ],
   };
@@ -31,11 +27,11 @@
   const {
     clickAction = defaultButtonClickHandler,
     buttonText = "Click Me",
-    buttonVariant = "#9EBC9E",
+    buttonColor = "#737373",
   } = $props();
 </script>
 
-<button style="background-color: {buttonVariant}" onclick={clickAction}>
+<button style="background-color: {buttonColor}" onclick={clickAction}>
   {buttonText}
 </button>
 

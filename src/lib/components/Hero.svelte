@@ -3,12 +3,14 @@
     props: [
       {
         name: "title",
+        title: "Title",
         type: "string",
         default: "Welcome to the site!",
         description: "The title of the hero section.",
       },
       {
         name: "content",
+        title: "Content",
         type: "string",
         default: "This is the hero content.",
         description: "The content of the hero section.",

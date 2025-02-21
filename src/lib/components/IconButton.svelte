@@ -3,11 +3,12 @@
     props: [
       {
         name: "clickAction",
+        title: "Click Action",
         type: "function",
         default: "defaultButtonClickHandler",
-        description: "The function to call when the button is clicked."
-      }
-    ]
+        description: "The function to call when the button is clicked.",
+      },
+    ],
   };
 </script>
 
@@ -15,13 +16,11 @@
   const defaultButtonClickHandler = (e) => {
     console.log(e);
   };
-  
+
   const { clickAction = defaultButtonClickHandler } = $props();
 </script>
 
-<button onclick={clickAction}>
-  Click Me
-</button>
+<button onclick={clickAction}> Click Me </button>
 
 <style>
   button {

@@ -3,6 +3,7 @@
   import EditBlock from "./EditBlock.svelte";
 
   const { blocks = [], components = [], page_id } = $props();
+  let current = $state(null);
   console.log("BLOCKS: ", blocks);
 </script>
 
@@ -11,7 +12,7 @@
 
   <div>
     {#each blocks as block}
-      <EditBlock {block} {page_id} {components} />
+      <EditBlock {block} {page_id} {components} bind:current />
     {/each}
   </div>
 </div>
