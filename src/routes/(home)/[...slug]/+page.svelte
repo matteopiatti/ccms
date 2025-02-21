@@ -1,19 +1,16 @@
 <script>
+  import Block from "$lib/components/admin/Block.svelte";
   const { data } = $props();
-  //console.log(data);
+  const { metadata, blocks } = $derived(data);
 </script>
 
 <svelte:head>
-  <title>{data.metadata.title}</title>
-  <meta name="description" content={data.metadata.description} />
+  <title>{metadata.title}</title>
+  <meta name="description" content={metadata.description} />
 </svelte:head>
 
-{#each data.components as c}
-  {#if Object.keys(c.props).length > 0}
-    <c.component.default {...c.props} />
-  {:else}
-    <c.component.default {...c.props_schema} />
-  {/if}
+{#each blocks as block}
+  <Block {block} />
 {/each}
 
 <a href="/admin">Back to Admin</a>

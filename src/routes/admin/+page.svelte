@@ -1,4 +1,5 @@
 <script>
+  import Block from "$lib/components/admin/Block.svelte";
   import { Button, buttonVariants } from "$lib/components/ui/button/index.js";
   import * as Table from "$lib/components/ui/table/index.js";
   import * as Dialog from "$lib/components/ui/dialog/index.js";
@@ -8,6 +9,7 @@
   import { enhance } from "$app/forms";
 
   let { data } = $props();
+  const { pages, blocks } = $derived(data);
   let pageDialog = $state({ isOpen: false });
 </script>
 
@@ -26,15 +28,17 @@
     {@render createPageDialog(pageDialog)}
   </div>
 
-  {@render pageTable(data.pages)}
+  {@render pageTable(pages)}
 
   <div class="flex items-center justify-between py-2 border-b">
     <h2 class="text-2xl font-bold">Components</h2>
   </div>
 
-  {#each data.components as comp}
-    {@render component(comp)}
-  {/each}
+  <div>
+    {#each blocks as block}
+      <Block {block} />
+    {/each}
+  </div>
 </div>
 
 {#snippet pageTable(pages)}
@@ -71,13 +75,6 @@
       </div>
     </Table.Cell>
   </Table.Row>
-{/snippet}
-
-{#snippet component({ name, component })}
-  <div>
-    <h2>{name}</h2>
-    <component.default />
-  </div>
 {/snippet}
 
 {#snippet createPageDialog(state)}

@@ -37,15 +37,12 @@ export const actions = {
   props: async ({ request, url }) => {
     const data = await request.formData();
 
-    console.log(getProps(data.entries()));
-
     await editPageComponent(
       base,
       data.get("page_id"),
       data.get("component_id"),
       data.get("page_components_id"),
-      getProps(data.entries()),
-      getChildren(data.entries())
+      getProps(data.entries())
     );
 
     return redirect(302, url.pathname);
@@ -57,7 +54,12 @@ export const actions = {
   },
   add: async ({ request, url }) => {
     const data = await request.formData();
-    createPageComponent(base, data.get("page_id"), data.get("component_id"));
+    await createPageComponent(
+      base,
+      data.get("page_id"),
+      data.get("component_id"),
+      data.get("parent_component_id")
+    );
     return redirect(302, url.pathname);
   },
   moveUp: async ({ request, url }) => {

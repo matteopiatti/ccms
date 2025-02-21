@@ -1,12 +1,9 @@
 import { base } from "$lib/knex";
 
 export const load = async ({ locals, params }) => {
-  const slug = params.slug;
-  const page = await base("pages").where({ slug }).first();
-
   return {
-    metadata: page,
-    components: await getPageComponents(slug),
+    metadata: await base("pages").where({ slug: params.slug }).first(),
+    blocks: await getPageComponents(params.slug),
   };
 };
 

@@ -1,5 +1,5 @@
 <script>
-  const { title, size = "2xl", border = false, children } = $props();
+  const { title, size = "2xl", border = true, children } = $props();
 </script>
 
 <div class="flex items-center justify-between py-2 {border && 'border-b'}">

@@ -8,6 +8,7 @@
   import { Separator } from "$lib/components/ui/separator/index.js";
   import { populateComponents } from "$lib";
   import AdminTitle from "$lib/components/admin/AdminTitle.svelte";
+  import BlockEditor from "$lib/components/admin/BlockEditor.svelte";
 
   const { data } = $props();
   const { metadata, components, blocks } = $derived(data);
@@ -42,15 +43,9 @@
       {@render component(c)}
     {/each}
   </div>
-
-  <AdminTitle title="All Blocks" />
-
-  <div class="grid gap-4">
-    {#each blocks as b}
-      {@render block(b)}
-    {/each}
-  </div>
 </div>
+
+<BlockEditor {blocks} {components} page_id={metadata.id} />
 
 {#snippet block(b)}
   <div
@@ -164,7 +159,6 @@
 {/snippet}
 
 {#snippet renderComponent(c, id, props, children)}
-  {console.log(children)}
   {#each c as component}
     {#if component.id === id}
       <component.component.default {...props}>
@@ -178,8 +172,8 @@
 
 {#snippet component(c)}
   <form action="?/add" method="POST" use:enhance>
-    <input type="hidden" name="pageId" value={metadata.id} />
-    <input type="hidden" name="componentId" value={c.id} />
+    <input type="hidden" name="page_id" value={metadata.id} />
+    <input type="hidden" name="component_id" value={c.id} />
     <Button type="submit" class="flex items-center gap-2">
       {c.name}
     </Button>

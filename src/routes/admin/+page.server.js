@@ -4,7 +4,7 @@ import { getAllComponents, getAllPages, createPage, deletePage } from "$lib";
 export const load = async ({ locals }) => {
   return {
     pages: await getAllPages(base),
-    components: await getAllComponents(base),
+    blocks: await getAllComponents(base),
   };
 };
 

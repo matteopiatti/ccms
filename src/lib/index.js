@@ -26,7 +26,12 @@ export async function deletePageComponent(base, page_components_id) {
   await base("page_components").where({ id: page_components_id }).delete();
 }
 
-export async function createPageComponent(base, page_id, component_id) {
+export async function createPageComponent(
+  base,
+  page_id,
+  component_id,
+  parent_component_id
+) {
   await base.transaction(async (trx) => {
     const orders = await trx("page_components")
       .where({ page_id, parent_component_id: null })
@@ -41,6 +46,7 @@ export async function createPageComponent(base, page_id, component_id) {
       component_id,
       order: reduced,
       props: "{}",
+      parent_component_id,
     });
   });
 }
@@ -50,26 +56,28 @@ export async function editPageComponent(
   page_id,
   component_id,
   page_components_id,
-  props,
-  children
+  props
 ) {
-  await base.transaction(async (trx) => {
-    await trx("page_components")
-      .where({ id: page_components_id, page_id, component_id })
-      .update({ props: JSON.stringify(props) });
+  await base("page_components")
+    .where({ id: page_components_id, page_id, component_id })
+    .update({ props: JSON.stringify(props) });
+  // await base.transaction(async (trx) => {
+  //   await trx("page_components")
+  //     .where({ id: page_components_id, page_id, component_id })
+  //     .update({ props: JSON.stringify(props) });
 
-    await Promise.all(
-      children.map(async (child) => {
-        await trx("page_components").insert({
-          page_id,
-          component_id: child.children,
-          parent_component_id: page_components_id,
-          order: 0,
-          props: "{}",
-        });
-      })
-    );
-  });
+  //   await Promise.all(
+  //     children.map(async (child) => {
+  //       await trx("page_components").insert({
+  //         page_id,
+  //         component_id: child.children,
+  //         parent_component_id: page_components_id,
+  //         order: 0,
+  //         props: "{}",
+  //       });
+  //     })
+  //   );
+  // });
 }
 
 function cleanComponents(components) {

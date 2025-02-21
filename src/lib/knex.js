@@ -31,7 +31,10 @@ const migrate = async () => {
       table.increments("id").primary();
       table.integer("page_id").references("pages.id");
       table.integer("component_id").references("components.id");
-      table.integer("parent_component_id").references("page_components.id");
+      table
+        .integer("parent_component_id")
+        .references("page_components.id")
+        .onDelete("CASCADE");
       table.json("props");
       table.integer("order");
     });

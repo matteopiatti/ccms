@@ -16,7 +16,7 @@
       {
         name: "buttonVariant",
         type: "color",
-        default: "#ffffff",
+        default: "#9EBC9E",
         description: "The variant of the button.",
       },
     ],
@@ -31,7 +31,7 @@
   const {
     clickAction = defaultButtonClickHandler,
     buttonText = "Click Me",
-    buttonVariant = "#ffffff",
+    buttonVariant = "#9EBC9E",
   } = $props();
 </script>
 
