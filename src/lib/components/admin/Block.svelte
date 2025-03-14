@@ -1,5 +1,5 @@
 <script>
-  import Block from "./Block.svelte";
+  import { BlockElements } from ".";
 
   const { block = {} } = $props();
   let BLOCK = $state();
@@ -22,7 +22,7 @@
 {#if BLOCK}
   <BLOCK {...propGenerator()}>
     {#each block.children as child}
-      <Block block={child} />
+      <BlockElements.Block block={child} />
     {/each}
   </BLOCK>
 {/if}

@@ -1,13 +1,8 @@
 <script>
-  import Label from "../ui/label/label.svelte";
-  import Input from "../ui/input/input.svelte";
-  import EditBlock from "./EditBlock.svelte";
   import { SquarePen, X, Trash2, ChevronDown, ChevronUp } from "lucide-svelte";
   import { enhance } from "$app/forms";
   import { Button } from "../ui/button/index.js";
-  import AdminFormButton from "./AdminFormButton.svelte";
-  import AddBlock from "./AddBlock.svelte";
-  import AdminPropFormElement from "./AdminPropFormElement.svelte";
+  import { BlockElements, LayoutElements } from ".";
 
   let {
     block = {},
@@ -50,7 +45,12 @@
       )}
     >
       {#each block.children as child}
-        <EditBlock block={child} {components} {page_id} bind:current />
+        <BlockElements.EditBlock
+          block={child}
+          {components}
+          {page_id}
+          bind:current
+        />
       {/each}
     </BLOCK>
   {/if}
@@ -67,7 +67,7 @@
       >
         <input type="hidden" name="id" value={block.id} />
         {#each block.component.default_props as defaultProp}
-          <AdminPropFormElement
+          <BlockElements.PropFormElement
             {defaultProp}
             prop={block.props.find((p) => p.default_prop_id === defaultProp.id)}
           />
@@ -75,17 +75,21 @@
         <Button type="submit">Save</Button>
       </form>
       {#if block.component.children}
-        <AddBlock {components} {page_id} parent_block={block.id} />
+        <BlockElements.AddBlock
+          {components}
+          {page_id}
+          parent_block={block.id}
+        />
       {/if}
       <div class="ml-auto flex gap-2">
         {@render moveButton("up", block.id)}
-        <AdminFormButton
+        <LayoutElements.FormButton
           action="?/delete"
           variant="destructive"
           hiddenFields={[{ name: "id", value: block.id }]}
         >
           <Trash2 /> Delete
-        </AdminFormButton>
+        </LayoutElements.FormButton>
         {@render moveButton("down", block.id)}
       </div>
     </div>
@@ -93,7 +97,7 @@
 </div>
 
 {#snippet moveButton(dir, block_id)}
-  <AdminFormButton
+  <LayoutElements.FormButton
     action="?/move"
     variant="outline"
     hiddenFields={[
@@ -106,5 +110,5 @@
     {:else}
       <ChevronDown />
     {/if}
-  </AdminFormButton>
+  </LayoutElements.FormButton>
 {/snippet}

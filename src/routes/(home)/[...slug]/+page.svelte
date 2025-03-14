@@ -1,5 +1,5 @@
 <script>
-  import Block from "$lib/components/admin/Block.svelte";
+  import { BlockElements } from "$lib/components/admin";
   const { data } = $props();
   const { page } = $derived(data);
 </script>
@@ -10,7 +10,7 @@
 </svelte:head>
 
 {#each page.blocks as block}
-  <Block {block} />
+  <BlockElements.Block {block} />
 {/each}
 
 <a href="/admin">Back to Admin</a>

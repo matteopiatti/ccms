@@ -1,42 +1,39 @@
 <script>
-  import EditDialog from "$lib/components/admin/EditDialog.svelte";
-  import { Button, buttonVariants } from "$lib/components/ui/button/index.js";
+  import { buttonVariants } from "$lib/components/ui/button/index.js";
   import * as Table from "$lib/components/ui/table/index.js";
-  import * as Dialog from "$lib/components/ui/dialog/index.js";
-  import AdminInput from "$lib/components/admin/AdminInput.svelte";
   import { Trash2 } from "lucide-svelte";
-  import { enhance } from "$app/forms";
-  import Header from "$lib/components/admin/Header.svelte";
-  import AdminTitle from "$lib/components/admin/AdminTitle.svelte";
-  import AdminFormButton from "$lib/components/admin/AdminFormButton.svelte";
-  import Block from "$lib/components/admin/Block.svelte";
+  import { LayoutElements, BlockElements } from "$lib/components/admin";
 
   let { data, form } = $props();
   const { pages, components } = $derived(data);
 </script>
 
-<Header title="Pages" name="Admin" />
+<LayoutElements.Header title="Pages" name="Admin" />
 
 <div class="flex flex-col px-4 py-2">
-  <AdminTitle title="Pages">
-    <EditDialog
+  <LayoutElements.Title title="Pages">
+    <LayoutElements.EditDialog
       name="New Page"
       description="Create a new page"
       submit="Create"
       action="?/createPage"
     >
-      <AdminInput title="Page title" name="title" error={form?.title} />
-      <AdminInput title="Slug" name="slug" error={form?.slug} />
-    </EditDialog>
-  </AdminTitle>
+      <LayoutElements.Input
+        title="Page title"
+        name="title"
+        error={form?.title}
+      />
+      <LayoutElements.Input title="Slug" name="slug" error={form?.slug} />
+    </LayoutElements.EditDialog>
+  </LayoutElements.Title>
 
   {@render pageTable(pages)}
 
-  <AdminTitle title="Components" />
+  <LayoutElements.Title title="Components" />
 
   <div>
     {#each components as component}
-      <Block block={component} />
+      <BlockElements.Block block={component} />
     {/each}
   </div>
 </div>
@@ -66,13 +63,13 @@
       <div class="flex flex-row gap-2 justify-end">
         <a href="/admin/edit/{slug}" class={buttonVariants()}>Edit</a>
         <a href={slug} class={buttonVariants({ variant: "outline" })}>Visit</a>
-        <AdminFormButton
+        <LayoutElements.FormButton
           action="?/deletePage"
           hiddenFields={[{ name: "id", value: id }]}
           variant="destructive"
         >
           <Trash2 />
-        </AdminFormButton>
+        </LayoutElements.FormButton>
       </div>
     </Table.Cell>
   </Table.Row>

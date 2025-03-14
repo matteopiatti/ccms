@@ -1,15 +1,14 @@
 <script>
-  import ColorPicker from "./ColorPicker.svelte";
-  import AdminInput from "./AdminInput.svelte";
+  import { LayoutElements } from ".";
 
   const { defaultProp, prop } = $props();
   const definer = $derived(prop || defaultProp);
   console.log(!prop);
   const ComponentMap = {
-    color: ColorPicker,
-    string: AdminInput,
+    color: LayoutElements.ColorPicker,
+    string: LayoutElements.Input,
   };
-  const PropField = ComponentMap[defaultProp.prop_type] || AdminInput;
+  const PropField = ComponentMap[defaultProp.prop_type] || LayoutElements.Input;
 </script>
 
 <input type="hidden" name="{definer.name}[isNew]" value={!prop} />
