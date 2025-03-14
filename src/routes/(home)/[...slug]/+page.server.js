@@ -2,6 +2,6 @@ import { Pages } from "$lib";
 
 export const load = async ({ locals, params }) => {
   return {
-    pageData: await Pages.SHOW(params.slug),
+    page: await Pages.SHOW(params.slug),
   };
 };

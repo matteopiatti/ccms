@@ -2,13 +2,12 @@
   import Label from "../ui/label/label.svelte";
   import Input from "../ui/input/input.svelte";
   import EditBlock from "./EditBlock.svelte";
-  import ColorPicker from "./ColorPicker.svelte";
-  import AdminInput from "./AdminInput.svelte";
   import { SquarePen, X, Trash2, ChevronDown, ChevronUp } from "lucide-svelte";
   import { enhance } from "$app/forms";
   import { Button } from "../ui/button/index.js";
   import AdminFormButton from "./AdminFormButton.svelte";
   import AddBlock from "./AddBlock.svelte";
+  import AdminPropFormElement from "./AdminPropFormElement.svelte";
 
   let {
     block = {},
@@ -23,14 +22,6 @@
     BLOCK = (await import(/* @vite-ignore */ "/" + block.component.filename))
       .default;
   });
-
-  const propGenerator = () => {
-    const props = {};
-    block.props.forEach((prop) => {
-      props[prop.name] = prop.default;
-    });
-    return props;
-  };
 </script>
 
 <div class="relative" class:z-50={isEdit}>
@@ -53,17 +44,37 @@
   </div>
 
   {#if BLOCK}
-    <BLOCK {...propGenerator()}>
+    <BLOCK
+      {...Object.fromEntries(
+        block.props.map((prop) => [prop.name, prop.value])
+      )}
+    >
       {#each block.children as child}
-        <EditBlock block={child} {page_id} bind:current />
+        <EditBlock block={child} {components} {page_id} bind:current />
       {/each}
     </BLOCK>
   {/if}
 
   {#if isEdit}
     <div class="flex items-end gap-4 p-4 bg-white text-black">
-      {@render editForm(block, page_id)}
-      {#if block.component.props.some((prop) => prop.name === "children")}
+      <form
+        class="flex flex-col gap-2 items-start"
+        method="POST"
+        action="?/props"
+        use:enhance={() => {
+          current = null;
+        }}
+      >
+        <input type="hidden" name="id" value={block.id} />
+        {#each block.component.default_props as defaultProp}
+          <AdminPropFormElement
+            {defaultProp}
+            prop={block.props.find((p) => p.default_prop_id === defaultProp.id)}
+          />
+        {/each}
+        <Button type="submit">Save</Button>
+      </form>
+      {#if block.component.children}
         <AddBlock {components} {page_id} parent_block={block.id} />
       {/if}
       <div class="ml-auto flex gap-2">
@@ -80,38 +91,6 @@
     </div>
   {/if}
 </div>
-
-{#snippet editForm(block, page_id, id)}
-  <form
-    class="flex flex-col gap-2 items-start"
-    method="POST"
-    action="?/props"
-    use:enhance
-  >
-    <input type="hidden" name="page_id" value={page_id} />
-    <input type="hidden" name="id" value={block.id} />
-    <input type="hidden" name="component_id" value={block.component_id} />
-    {#each block.component.props as prop}
-      <input type="hidden" name="{prop.name}[name]" value={prop.name} />
-      <input type="hidden" name="{prop.name}[id]" value={prop.id} />
-      {#if prop.prop_type === "color"}
-        <ColorPicker
-          name="{prop.name}[value]"
-          title={prop.title}
-          value={block.props.find((p) => p.name === prop.name) || prop.default}
-        />
-      {:else}
-        <AdminInput
-          title={prop.title}
-          name="{prop.name}[value]"
-          value={block.props.find((p) => p.name === prop.name)?.default ||
-            prop.default}
-        />
-      {/if}
-    {/each}
-    <Button type="submit">Save</Button>
-  </form>
-{/snippet}
 
 {#snippet moveButton(dir, block_id)}
   <AdminFormButton

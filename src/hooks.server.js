@@ -1,11 +1,7 @@
-import { base, migrate } from "$lib/knex";
-import { seed } from "$lib/faker";
 import * as COMPONENTS from "$lib/components";
 import { Components } from "$lib";
 
-//await migrate();
 syncComponents();
-//await seed();
 
 async function syncComponents() {
   Object.entries(COMPONENTS).forEach(async ([name, value]) => {
@@ -13,16 +9,20 @@ async function syncComponents() {
       (sym) => sym.toString() === "Symbol(filename)"
     );
     const filename = value[filenameSymbol];
-    const schema =
+    const metadata =
       (
         await import(
           /* @vite-ignore */ `./lib/components/${filename.split("/").pop()}`
         )
-      ).metadata?.props || [];
+      ).metadata || [];
 
     try {
-      //TODO: should check if exists and update info if it does
-      const test = await Components.POST({ name, filename, schema });
+      const test = await Components.POST({
+        name,
+        filename,
+        schema: metadata?.props,
+        children: metadata?.children,
+      });
     } catch (e) {
       console.error(e);
     }

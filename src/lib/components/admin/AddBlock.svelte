@@ -1,7 +1,7 @@
 <script>
   import { Plus } from "lucide-svelte";
   import * as Sheet from "$lib/components/ui/sheet/index.js";
-  import Component from "./Component.svelte";
+  import Block from "./Block.svelte";
   import { enhance } from "$app/forms";
 
   let { components = [], page_id, parent_block = null } = $props();
@@ -41,7 +41,7 @@
             <Plus
               class="w-8 h-8 absolute opacity-0 group-hover:opacity-100 text-blue-500"
             />
-            <Component component={block} />
+            <Block {block} />
           </button>
         </form>
       {/each}

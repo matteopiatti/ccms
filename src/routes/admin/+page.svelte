@@ -9,7 +9,7 @@
   import Header from "$lib/components/admin/Header.svelte";
   import AdminTitle from "$lib/components/admin/AdminTitle.svelte";
   import AdminFormButton from "$lib/components/admin/AdminFormButton.svelte";
-  import Component from "$lib/components/admin/Component.svelte";
+  import Block from "$lib/components/admin/Block.svelte";
 
   let { data, form } = $props();
   const { pages, components } = $derived(data);
@@ -36,7 +36,7 @@
 
   <div>
     {#each components as component}
-      <Component {component} />
+      <Block block={component} />
     {/each}
   </div>
 </div>

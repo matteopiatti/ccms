@@ -13,7 +13,6 @@
   import AdminFormButton from "$lib/components/admin/AdminFormButton.svelte";
 
   const { data, form } = $props();
-  //console.log(data.page.page);
 </script>
 
 <Header title="Edit Page" subtitle={data.page.title} name="Admin" />

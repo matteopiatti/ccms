@@ -1,13 +1,4 @@
-import { base } from "$lib/knex";
-import {
-  getAllComponents,
-  getAllPages,
-  createPage,
-  deletePage,
-  Blocks,
-  Pages,
-  Components,
-} from "$lib";
+import { Blocks, Pages, Components } from "$lib";
 import { fail } from "@sveltejs/kit";
 
 export const load = async ({ locals }) => {

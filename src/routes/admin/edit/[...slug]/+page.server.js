@@ -1,18 +1,5 @@
 import { redirect } from "@sveltejs/kit";
-import { base } from "$lib/knex";
-import {
-  getPageComponents,
-  deletePageComponent,
-  createPageComponent,
-  getAllComponents,
-  getPage,
-  editPage,
-  editPageComponent,
-  movePageComponent,
-  Pages,
-  Components,
-  Blocks,
-} from "$lib";
+import { Pages, Components, Blocks, Props } from "$lib";
 
 export const load = async ({ locals, params }) => {
   const page = await Pages.SHOW(params.slug);
@@ -39,38 +26,16 @@ export const actions = {
     }
   },
   props: async ({ request, url }) => {
-    const { page_id, id, component_id, ...leftovers } = Object.fromEntries(
-      await request.formData()
-    );
-    let finishedProps = [];
+    const { id, ...leftovers } = Object.fromEntries(await request.formData());
     const props = cleanProps(leftovers);
-    const defaultProps = await Components.SHOW(component_id);
-
-    Object.entries(props).forEach(([key, prop]) => {
-      const defaultProp = defaultProps.props.find((p) => p.name === prop.name);
-      finishedProps.push({
-        name: prop.name,
-        title: defaultProp.title,
-        prop_type: defaultProp.prop_type,
-        default: prop.value,
-        description: defaultProp.description,
-      });
-    });
-
-    console.log(finishedProps);
-    return;
-
-    const req = await Blocks.UPDATE(id, {
-      name: block.name,
-      component_id: block.component_id,
-      page_id,
-      parent_block_id: block.parent_block_id,
-      props: Object.entries(props).map(([key, value]) => ({
-        name: key,
-        default: value,
-      })),
-    });
-    console.log(req);
+    await Promise.all(
+      props.map(async ({ isNew, id: propId, ...prop }) => {
+        delete prop.isNew;
+        return isNew === "true"
+          ? Props.POST({ ...prop, block_id: id, default_prop_id: propId })
+          : Props.UPDATE(propId, prop);
+      })
+    );
     return { success: true };
   },
   delete: async ({ request, url }) => {
@@ -98,17 +63,19 @@ export const actions = {
     const { id, direction } = Object.fromEntries(await request.formData());
 
     const req = await Blocks.MOVE(id, direction);
-    console.log(req);
 
     return { success: true };
   },
 };
 
 const cleanProps = (props) => {
-  return Object.entries(props).reduce(function (r, e) {
-    const [a, i] = e[0].split(/\[(.*?)\]/g);
-    if (!r[a]) r[a] = {};
-    r[a][i] = e[1];
-    return r;
-  }, []);
+  const result = [];
+
+  for (const [key, value] of Object.entries(props)) {
+    const [propName, attribute] = key.match(/(.*?)\[(.*?)\]/).slice(1);
+    if (!result[propName]) result[propName] = {};
+    result[propName][attribute] = value;
+  }
+
+  return Object.values(result);
 };

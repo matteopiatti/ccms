@@ -15,14 +15,8 @@
         default: "This is the hero content.",
         description: "The content of the hero section.",
       },
-      {
-        name: "children",
-        title: "Children",
-        prop_type: "slot",
-        default: "",
-        description: "The children of the hero section.",
-      },
     ],
+    children: true,
   };
 </script>
 

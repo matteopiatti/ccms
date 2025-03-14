@@ -1,7 +1,7 @@
 <script>
   import Block from "$lib/components/admin/Block.svelte";
   const { data } = $props();
-  const { page, blocks } = $derived(data.pageData);
+  const { page } = $derived(data);
 </script>
 
 <svelte:head>
@@ -9,7 +9,7 @@
   <meta name="description" content={page.description} />
 </svelte:head>
 
-{#each blocks as block}
+{#each page.blocks as block}
   <Block {block} />
 {/each}
 

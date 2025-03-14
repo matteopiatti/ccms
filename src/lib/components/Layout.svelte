@@ -1,14 +1,7 @@
 <script module>
   export const metadata = {
-    props: [
-      {
-        name: "children",
-        title: "Children",
-        type: "slot",
-        default: "",
-        description: "The children of the hero section.",
-      },
-    ],
+    props: [],
+    children: true,
   };
 </script>
 

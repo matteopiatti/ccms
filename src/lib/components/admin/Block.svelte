@@ -3,16 +3,17 @@
 
   const { block = {} } = $props();
   let BLOCK = $state();
+  const filename = block.component?.filename || block.filename;
 
   $effect(async () => {
-    BLOCK = (await import(/* @vite-ignore */ "/" + block.component.filename))
-      .default;
+    BLOCK = (await import(/* @vite-ignore */ "/" + filename)).default;
   });
 
   const propGenerator = () => {
     const props = {};
+    if (!block.props) return;
     block.props.forEach((prop) => {
-      props[prop.name] = prop.default;
+      props[prop.name] = prop.value;
     });
     return props;
   };
