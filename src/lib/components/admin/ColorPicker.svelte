@@ -22,9 +22,7 @@
   ]);
 </script>
 
-<div class="opacity-0 absolute">
-  <input type="color" id="color" {name} bind:value />
-</div>
+<input type="hidden" id="color" {name} bind:value />
 
 <div class="flex flex-col gap-4">
   <label for="color" bind:this={label}>{title}</label>
@@ -41,11 +39,5 @@
         aria-label="Select color {color}"
       ></button>
     {/each}
-    <button
-      type="button"
-      class="w-8 h-8 flex items-center justify-center rounded cursor-pointer transition-all hover:opacity-75 hover:outline-blue-500 hover:outline outline-2 outline-offset-2"
-      style="background-color: {value};"
-      onclick={() => label.click()}><Plus /></button
-    >
   </div>
 </div>

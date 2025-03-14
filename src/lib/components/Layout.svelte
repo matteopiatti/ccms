@@ -2,23 +2,9 @@
   export const metadata = {
     props: [
       {
-        name: "title",
-        title: "Title",
-        prop_type: "string",
-        default: "Welcome to the site!",
-        description: "The title of the hero section.",
-      },
-      {
-        name: "content",
-        title: "Content",
-        prop_type: "string",
-        default: "This is the hero content.",
-        description: "The content of the hero section.",
-      },
-      {
         name: "children",
         title: "Children",
-        prop_type: "slot",
+        type: "slot",
         default: "",
         description: "The children of the hero section.",
       },
@@ -35,16 +21,20 @@
 </script>
 
 <div class="hero">
-  <h1>{title}</h1>
-  <p>{content}</p>
   {@render children()}
 </div>
 
 <style>
   .hero {
-    background-color: #787878;
+    background-color: #a3bda3;
     color: white;
     padding: 2rem;
     text-align: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hero > :global(:first-child) {
+    grid-column: 1 / 3;
   }
 </style>

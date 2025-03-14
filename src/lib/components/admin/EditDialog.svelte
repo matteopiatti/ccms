@@ -1,10 +1,11 @@
 <script>
   import * as Dialog from "$lib/components/ui/dialog/index.js";
   import { Button, buttonVariants } from "$lib/components/ui/button/index.js";
-  import { enhance } from "$app/forms";
+  import { enhance, applyAction } from "$app/forms";
+  import { goto, invalidateAll } from "$app/navigation";
 
   let {
-    isOpen = $bindable(),
+    isOpen = $bindable(false),
     name,
     description,
     submit,
@@ -22,7 +23,18 @@
       method="POST"
       {action}
       use:enhance={() => {
-        isOpen = false;
+        return async ({ result }) => {
+          await applyAction(result);
+          console.log(result);
+          if (result.type === "success") {
+            isOpen = false;
+            await invalidateAll();
+          } else if (result.type === "redirect") {
+            isOpen = false;
+            await invalidateAll();
+            goto(result.location);
+          }
+        };
       }}
     >
       <Dialog.Header>

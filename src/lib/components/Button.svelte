@@ -4,14 +4,14 @@
       {
         name: "buttonText",
         title: "Button Text",
-        type: "string",
+        prop_type: "string",
         default: "Click Me",
         description: "The text to display on the button.",
       },
       {
         name: "buttonColor",
         title: "Button Color",
-        type: "color",
+        prop_type: "color",
         default: "#737373",
         description: "The Color of the button.",
       },

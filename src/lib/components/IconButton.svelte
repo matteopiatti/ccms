@@ -4,7 +4,7 @@
       {
         name: "clickAction",
         title: "Click Action",
-        type: "function",
+        props_type: "function",
         default: "defaultButtonClickHandler",
         description: "The function to call when the button is clicked.",
       },

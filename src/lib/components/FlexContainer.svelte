@@ -4,7 +4,7 @@
       {
         name: "children",
         title: "Children",
-        type: "slot",
+        prop_type: "slot",
         default: "",
         description: "The children of the hero section.",
       },

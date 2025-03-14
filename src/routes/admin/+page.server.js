@@ -1,21 +1,29 @@
 import { base } from "$lib/knex";
-import { getAllComponents, getAllPages, createPage, deletePage } from "$lib";
+import {
+  getAllComponents,
+  getAllPages,
+  createPage,
+  deletePage,
+  Blocks,
+  Pages,
+  Components,
+} from "$lib";
+import { fail } from "@sveltejs/kit";
 
 export const load = async ({ locals }) => {
   return {
-    pages: await getAllPages(base),
-    blocks: await getAllComponents(base),
+    pages: await Pages.GET(),
+    components: await Components.GET(),
   };
 };
 
 export const actions = {
   createPage: async ({ request }) => {
-    const data = await request.formData();
-    createPage(base, data.get("title"), data.get("slug"), data.get("content"));
+    const { title, slug } = Object.fromEntries(await request.formData());
+    return await Pages.POST({ title, slug });
   },
   deletePage: async ({ request }) => {
-    const data = await request.formData();
-    console.log(data.get("id"));
-    deletePage(base, data.get("id"));
+    const { id } = Object.fromEntries(await request.formData());
+    return await Pages.DELETE(id);
   },
 };

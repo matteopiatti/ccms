@@ -8,127 +8,107 @@ import {
   getPage,
   editPage,
   editPageComponent,
+  movePageComponent,
+  Pages,
+  Components,
+  Blocks,
 } from "$lib";
 
 export const load = async ({ locals, params }) => {
-  const page = await getPage(base, params.slug);
+  const page = await Pages.SHOW(params.slug);
+
+  if (page.error) {
+    return redirect(302, "/admin");
+  }
 
   return {
-    metadata: page,
-    blocks: await getPageComponents(base, page.id),
-    components: await getAllComponents(base),
+    page,
+    components: await Components.GET(),
   };
 };
 
 export const actions = {
   editMetadata: async ({ locals, request }) => {
-    const data = await request.formData();
+    const { id, title, slug } = Object.fromEntries(await request.formData());
+    const req = await Pages.UPDATE(id, { title, slug });
 
-    await editPage(
-      base,
-      data.get("id"),
-      data.get("title"),
-      data.get("slug"),
-      data.get("content")
-    );
-
-    return redirect(302, `/admin/edit/${data.get("slug")}`);
+    if (req.status === 200) {
+      return redirect(302, `/admin/edit/${slug}`);
+    } else {
+      return req;
+    }
   },
   props: async ({ request, url }) => {
-    const data = await request.formData();
-
-    await editPageComponent(
-      base,
-      data.get("page_id"),
-      data.get("component_id"),
-      data.get("page_components_id"),
-      getProps(data.entries())
+    const { page_id, id, component_id, ...leftovers } = Object.fromEntries(
+      await request.formData()
     );
+    let finishedProps = [];
+    const props = cleanProps(leftovers);
+    const defaultProps = await Components.SHOW(component_id);
+
+    Object.entries(props).forEach(([key, prop]) => {
+      const defaultProp = defaultProps.props.find((p) => p.name === prop.name);
+      finishedProps.push({
+        name: prop.name,
+        title: defaultProp.title,
+        prop_type: defaultProp.prop_type,
+        default: prop.value,
+        description: defaultProp.description,
+      });
+    });
+
+    console.log(finishedProps);
+    return;
+
+    const req = await Blocks.UPDATE(id, {
+      name: block.name,
+      component_id: block.component_id,
+      page_id,
+      parent_block_id: block.parent_block_id,
+      props: Object.entries(props).map(([key, value]) => ({
+        name: key,
+        default: value,
+      })),
+    });
+    console.log(req);
     return { success: true };
   },
   delete: async ({ request, url }) => {
-    const data = await request.formData();
-    await deletePageComponent(base, data.get("page_components_id"));
+    const { id } = Object.fromEntries(await request.formData());
+    const req = await Blocks.DELETE(id);
     return { success: true };
   },
   add: async ({ request, url }) => {
-    const data = await request.formData();
-    await createPageComponent(
-      base,
-      data.get("page_id"),
-      data.get("component_id"),
-      data.get("parent_component_id")
+    const { page_id, component_id, parent_block_id } = Object.fromEntries(
+      await request.formData()
     );
+    const component = await Components.SHOW(component_id);
 
-    return { success: true };
-  },
-  moveUp: async ({ request, url }) => {
-    const data = await request.formData();
-    const page_components_id = data.get("page_components_id");
-    const page_id = data.get("page_id");
-
-    try {
-      const page_components = await base("page_components")
-        .where({ id: page_components_id })
-        .first();
-      const order = page_components.order;
-      const all = await base("page_components").where({ page_id }).select("*");
-      const prev = all
-        .filter((c) => c.order < order)
-        .reduce((a, b) => (a.order > b.order ? a : b));
-
-      if (prev) {
-        await base("page_components")
-          .where({ id: page_components_id })
-          .update({ order: order - 1 });
-        await base("page_components").where({ id: prev.id }).update({ order });
-      }
-    } catch (e) {
-      console.error(e);
-    }
-
-    return { success: true };
-  },
-  moveDown: async ({ request, url }) => {
-    const data = await request.formData();
-    const page_components_id = data.get("page_components_id");
-    const page_id = data.get("page_id");
-
-    try {
-      const page_components = await base("page_components")
-        .where({ id: page_components_id })
-        .first();
-      const order = page_components.order;
-      const all = await base("page_components").where({ page_id }).select("*");
-      const next = all
-        .filter((c) => c.order > order)
-        .reduce((a, b) => (a.order < b.order ? a : b));
-      if (next) {
-        await base("page_components")
-          .where({ id: page_components_id })
-          .update({ order: order + 1 });
-        await base("page_components").where({ id: next.id }).update({ order });
-      }
-    } catch (e) {
-      console.error(e);
-    }
-
-    return { success: true };
-  },
-};
-
-const getProps = (data) => {
-  return Object.fromEntries(
-    [...data]
-      .filter(([key]) => key.startsWith("prop_"))
-      .map(([key, value]) => [key.replace("prop_", ""), value])
-  );
-};
-
-const getChildren = (data) => {
-  return [...data]
-    .filter(([key]) => key.startsWith("slot_"))
-    .map(([key, value]) => {
-      return { [key.replace("slot_", "")]: value };
+    const req = await Blocks.POST({
+      page_id,
+      name: component.name,
+      component_id,
+      parent_block_id,
+      props: [],
     });
+
+    return { success: true };
+  },
+  move: async ({ request, url }) => {
+    const { id, direction } = Object.fromEntries(await request.formData());
+
+    const req = await Blocks.MOVE(id, direction);
+    console.log(req);
+
+    return { success: true };
+  },
+};
+
+const cleanProps = (props) => {
+  return Object.entries(props).reduce(function (r, e) {
+    const [a, i] = e[0].split(/\[(.*?)\]/g);
+    if (!r[a]) r[a] = {};
+    r[a][i] = e[1];
+    return r;
+  }, []);
 };

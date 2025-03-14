@@ -1,12 +1,12 @@
 <script>
   import Block from "$lib/components/admin/Block.svelte";
   const { data } = $props();
-  const { metadata, blocks } = $derived(data);
+  const { page, blocks } = $derived(data.pageData);
 </script>
 
 <svelte:head>
-  <title>{metadata.title}</title>
-  <meta name="description" content={metadata.description} />
+  <title>{page.title}</title>
+  <meta name="description" content={page.description} />
 </svelte:head>
 
 {#each blocks as block}
