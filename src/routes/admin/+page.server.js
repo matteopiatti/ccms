@@ -1,10 +1,12 @@
 import { Blocks, Pages, Components } from "$lib";
 import { fail } from "@sveltejs/kit";
+import { getCurrentFolder } from "$lib/utils.js";
 
 export const load = async ({ locals }) => {
   return {
     pages: await Pages.GET(),
     components: await Components.GET(),
+    blockDirectory: getCurrentFolder(),
   };
 };
 

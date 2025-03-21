@@ -42,4 +42,5 @@
   blocks={data.page.blocks}
   components={data.components}
   page_id={data.page.id}
+  blockDir={data.blockDirectory}
 />

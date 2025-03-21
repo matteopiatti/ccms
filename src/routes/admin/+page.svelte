@@ -33,7 +33,7 @@
 
   <div>
     {#each components as component}
-      <BlockElements.Block block={component} />
+      <BlockElements.Block block={component} dir={data.blockDirectory} />
     {/each}
   </div>
 </div>

@@ -1,8 +1,9 @@
 import { Pages } from "$lib";
+import { getCurrentFolder } from "$lib/utils.js";
 
 export const load = async ({ locals, params }) => {
-  // testing changes
   return {
     page: await Pages.SHOW(params.slug),
+    blockDirectory: getCurrentFolder(),
   };
 };

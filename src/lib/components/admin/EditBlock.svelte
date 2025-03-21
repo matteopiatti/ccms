@@ -9,13 +9,15 @@
     components = [],
     page_id,
     current = $bindable(),
+    dir,
   } = $props();
   let BLOCK = $state();
   let isEdit = $derived(current === block.id);
 
   $effect(async () => {
-    BLOCK = (await import(/* @vite-ignore */ "/" + block.component.filename))
-      .default;
+    BLOCK = (
+      await import(/* @vite-ignore */ dir + "/" + block.component.filename)
+    ).default;
   });
 </script>
 
@@ -50,6 +52,7 @@
           {components}
           {page_id}
           bind:current
+          {dir}
         />
       {/each}
     </BLOCK>

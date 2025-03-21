@@ -1,5 +1,6 @@
 import { redirect } from "@sveltejs/kit";
 import { Pages, Components, Blocks, Props } from "$lib";
+import { getCurrentFolder } from "$lib/utils.js";
 
 export const load = async ({ locals, params }) => {
   const page = await Pages.SHOW(params.slug);
@@ -11,6 +12,7 @@ export const load = async ({ locals, params }) => {
   return {
     page,
     components: await Components.GET(),
+    blockDirectory: getCurrentFolder(),
   };
 };
 

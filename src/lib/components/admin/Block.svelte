@@ -1,12 +1,12 @@
 <script>
   import { BlockElements } from ".";
 
-  const { block = {} } = $props();
+  const { block = {}, dir } = $props();
   let BLOCK = $state();
   const filename = block.component?.filename || block.filename;
 
   $effect(async () => {
-    BLOCK = (await import(/* @vite-ignore */ "/" + filename)).default;
+    BLOCK = (await import(/* @vite-ignore */ dir + "/" + filename)).default;
   });
 
   const propGenerator = () => {
@@ -22,7 +22,7 @@
 {#if BLOCK}
   <BLOCK {...propGenerator()}>
     {#each block.children as child}
-      <BlockElements.Block block={child} />
+      <BlockElements.Block block={child} {dir} />
     {/each}
   </BLOCK>
 {/if}
