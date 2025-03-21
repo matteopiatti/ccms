@@ -19,15 +19,22 @@
 
 <style>
   .hero {
-    background-color: #a3bda3;
-    color: white;
+    background-image: linear-gradient(#b6b6b6 50%, rgba(255, 255, 255, 0) 0%),
+      linear-gradient(#b6b6b6 50%, rgba(255, 255, 255, 0) 0%);
+    background-position: left, right;
+    background-size: 1px 10px;
+    background-repeat: repeat-y;
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1104px;
+    min-height: 200px;
     padding: 2rem;
-    text-align: center;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
   }
 
-  .hero > :global(:first-child) {
-    grid-column: 1 / 3;
+  .hero:empty:before {
+    content: "Layoutblock content goes here:";
   }
 </style>

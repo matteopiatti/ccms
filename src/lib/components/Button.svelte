@@ -42,5 +42,6 @@
     border: none;
     border-radius: 0.25rem;
     cursor: pointer;
+    margin-right: auto;
   }
 </style>
