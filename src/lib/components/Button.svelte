@@ -17,9 +17,7 @@
       },
     ],
   };
-</script>
 
-<script>
   const defaultButtonClickHandler = (e) => {
     console.log(e);
   };
